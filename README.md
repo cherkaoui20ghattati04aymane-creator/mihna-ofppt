@@ -2,7 +2,7 @@
 
 Mihna réunit la recherche d’opportunités, le CV, le matching explicable, le suivi des candidatures, la préparation aux entretiens et les tableaux d’analyse. Sous Windows, `INSTALLER_WINDOWS.bat` prépare les dépendances et `LANCER_MON_PROJET.bat` ouvre l’application locale avec authentification.
 
-- [Documentation technique](docs/DOCUMENTATION_TECHNIQUE_COMPLETE.md)
+- [Documentation technique](docs/DOCUMENTATION_TECHNIQUE_FINALE.md)
 - [Guide de soutenance OFPPT](docs/GUIDE_SOUTENANCE_OFPPT.md)
 - [Résultats des tests](docs/FINAL_TEST_RESULTS.md)
 - [Données et droits des sources](docs/FINAL_DATA_SOURCE_REPORT.md)
