@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>{% block title %}Mihna{% endblock %}</title>
+  <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='mihna-mark.svg') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='auth.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='brand.css') }}">
+  <script defer src="{{ url_for('static', filename='auth.js') }}"></script>
+</head>
+<body>
+  <div class="auth-layout">
+    <aside class="auth-brand" aria-label="Mihna">
+      <a class="auth-logo" href="/login" aria-label="Mihna, accueil connexion"><img src="{{ url_for('static', filename='mihna-mark.svg') }}" alt=""><span>Mihna</span></a>
+      <div class="auth-pitch">
+        <h2>Votre parcours vers le premier emploi, au même endroit.</h2>
+        <ul>
+          <li>Un profil unique qui préremplit vos CV</li>
+          <li>Un CV adapté à chaque offre, sans rien inventer</li>
+          <li>Analyse des écarts, feuille de route et entretiens</li>
+          <li>Candidatures suivies, statistiques réelles</li>
+        </ul>
+      </div>
+      <p class="auth-foot">Données privées, chiffrées dans votre espace. Gemini uniquement avec votre accord.</p>
+    </aside>
+    <main class="page-shell">
+      <a class="brand mobile-only" href="/login" aria-label="Mihna, accueil connexion">
+        <span class="brand-mark" aria-hidden="true"><img src="{{ url_for('static', filename='mihna-mark.svg') }}" alt=""></span>
+        <span><strong>Mihna</strong><small>Votre parcours professionnel commence ici</small></span>
+      </a>
+      {% block content %}{% endblock %}
+      <footer class="site-footer">Accès sécurisé · Session protégée</footer>
+    </main>
+  </div>
+</body>
+</html>

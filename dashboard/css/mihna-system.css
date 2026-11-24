@@ -1,0 +1,158 @@
+/* ==========================================================================
+   Mihna design system — final layer (loaded last by style.css).
+   One set of tokens for every page; older layers (design.css, mihna-brand.css,
+   studio.css, phase5.css) stay for structure, this file sets the final look.
+   ========================================================================== */
+:root{
+  /* Brand */
+  --brand-900:#141a3a; --brand-800:#1c2350; --brand-600:#4b46c8; --brand-500:#5954d9; --brand-100:#ecebff; --brand-50:#f6f5ff;
+  --accent-500:#e58a55; /* terracotta accent: highlights only, never body text */
+  /* Neutrals */
+  --ink:#1d2135; --ink-2:#4a5068; --muted:#6b7189; --line:#e3e5ef; --line-strong:#cfd3e3; --surface:#ffffff; --bg:#f5f6fb;
+  /* Status */
+  --ok-600:#13795b; --ok-50:#e8f6f0; --warn-700:#8a5a00; --warn-50:#fff5e0; --err-600:#b42335; --err-50:#fdecee; --info-600:#2f5bd3; --info-50:#eef3ff;
+  /* Shape, depth, rhythm */
+  --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:20px;
+  --sh-1:0 1px 2px rgba(20,26,58,.05),0 4px 14px rgba(20,26,58,.04);
+  --sh-2:0 10px 30px rgba(20,26,58,.09);
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:24px; --s-6:32px;
+  --focus:0 0 0 3px rgba(89,84,217,.28);
+  /* Legacy aliases used by older layers */
+  --blue:var(--brand-500); --navy:var(--brand-900); --text:var(--ink); --panel:var(--surface); --soft:var(--brand-50); --radius:var(--r-lg); --shadow:var(--sh-1);
+}
+
+/* --- Global correctness --------------------------------------------------- */
+[hidden]{display:none!important}           /* buttons with display:flex must still honour `hidden` */
+body{color:var(--ink);background:var(--bg)}
+:focus-visible{outline:none;box-shadow:var(--focus)!important;border-radius:var(--r-sm)}
+a{color:var(--brand-600)}
+.subtle,.meta,.section-info{color:var(--muted)}
+
+/* --- Typography scale ----------------------------------------------------- */
+.page-title h1{font-size:clamp(24px,2.4vw,30px);line-height:1.2;font-weight:750;color:var(--ink)}
+.page-title p{color:var(--ink-2);font-size:14px}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--brand-500);margin:0 0 4px}
+.panel-head h2,.panel>h2{font-size:15.5px;font-weight:700;color:var(--ink)}
+
+/* --- Sidebar & top bar ---------------------------------------------------- */
+.sidebar{background:linear-gradient(180deg,var(--brand-900),var(--brand-800));position:fixed;top:0;bottom:0;display:flex;flex-direction:column}
+.nav{flex:1}
+.nav-label{color:#8f97bd;font-size:10px;letter-spacing:.14em;margin:12px 12px 4px}
+.nav{gap:2px}
+.nav a{color:#c3c9e3;font-weight:550;min-height:38px;padding:8px 12px}
+.brand{padding-bottom:18px}
+.side-bottom{padding-top:12px}
+.side-note{display:none}
+.nav a.active{background:var(--brand-500);color:#fff;box-shadow:0 6px 16px rgba(10,12,40,.35)}
+.topbar>.actions{min-width:0}
+.breadcrumb{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.global-search{width:clamp(170px,20vw,280px)}
+@media(max-width:960px){.global-search{display:none!important}}
+.topbar{background:rgba(255,255,255,.86);backdrop-filter:saturate(1.4) blur(8px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+
+/* --- Surfaces ------------------------------------------------------------- */
+.panel,.stat,.offer{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);box-shadow:var(--sh-1)}
+.panel{padding:var(--s-5)}
+.panel.highlight{border-color:var(--brand-500);box-shadow:0 0 0 3px var(--brand-100),var(--sh-1)}
+.stat .stat-top{color:var(--ink-2)}
+.notice{border-radius:var(--r-md);background:var(--info-50);border:1px solid #d7e1fb;color:#24365f}
+.notice.warning{background:var(--warn-50);border-color:#f3dcaa;color:var(--warn-700)}
+
+/* --- Buttons -------------------------------------------------------------- */
+.btn{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:9px 15px;border-radius:var(--r-md);border:1px solid var(--line-strong);background:var(--surface);color:var(--ink);font-weight:650;font-size:13px}
+.btn:hover{background:var(--brand-50);border-color:#bfc0ee}
+.btn.primary{background:var(--brand-500);border-color:var(--brand-500);color:#fff}
+.btn.primary:hover{background:var(--brand-600);border-color:var(--brand-600)}
+.btn.danger{color:var(--err-600);border-color:#f1c4ca}
+.btn[disabled],.btn[aria-disabled="true"]{opacity:.55;cursor:not-allowed;transform:none!important}
+
+/* --- Forms ---------------------------------------------------------------- */
+input,select,textarea{font-size:14px;color:var(--ink);border:1px solid var(--line-strong);border-radius:var(--r-md);background:var(--surface);min-height:42px}
+textarea{line-height:1.5}
+input::placeholder,textarea::placeholder{color:#9298b0}
+input:focus,select:focus,textarea:focus{border-color:var(--brand-500);box-shadow:var(--focus);outline:none}
+.field>span{font-weight:650;color:var(--ink-2);font-size:12.5px}
+.field small{color:var(--muted)}
+.toolbar{display:flex;flex-wrap:wrap;gap:var(--s-3);align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:var(--s-3);box-shadow:var(--sh-1)}
+.toolbar>input{flex:1 1 260px}
+.toolbar>select{flex:0 1 190px}
+.toolbar input,.toolbar select{font-size:13.5px}
+
+/* --- Badges --------------------------------------------------------------- */
+.badge{border-radius:999px;font-weight:650;font-size:11px;padding:3px 9px}
+.badge.green{background:var(--ok-50);color:var(--ok-600)}
+.badge.amber{background:var(--warn-50);color:var(--warn-700)}
+.badge.gray{background:#f0f1f6;color:#555b73}
+
+/* --- Tables --------------------------------------------------------------- */
+.table-wrap{overflow-x:auto;border-radius:var(--r-md)}
+table{border-collapse:separate;border-spacing:0;width:100%}
+thead th{background:#f7f8fc;color:var(--ink-2);font-size:11px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;border-bottom:1px solid var(--line);padding:12px 14px;text-align:left}
+tbody td{padding:14px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:hover td{background:#fafaff}
+tbody td[colspan] .empty{border:0;box-shadow:none;margin:0}
+
+/* --- Offer cards ---------------------------------------------------------- */
+.offer{border-top:3px solid var(--brand-500)}
+.offer .actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;border-top:1px solid var(--line);padding-top:14px;margin-top:auto}
+.offer .actions .btn{justify-content:center;width:100%}
+.offer .actions>:nth-child(n+3){grid-column:1/-1}
+.offer>p:not(.desc){font-size:13px;color:var(--ink-2);margin:0}
+
+/* --- Empty state ---------------------------------------------------------- */
+.empty{border:1px dashed var(--line-strong);border-radius:var(--r-lg);background:var(--surface);text-align:center;padding:36px 20px}
+.empty h3{color:var(--ink);font-size:16px}
+.empty p{color:var(--muted);max-width:520px;margin-inline:auto}
+
+/* --- Dialogs & toasts ----------------------------------------------------- */
+dialog{border:1px solid var(--line);border-radius:var(--r-xl);box-shadow:var(--sh-2);max-width:min(760px,94vw)}
+dialog::backdrop{background:rgba(20,26,58,.45)}
+.toast{border-radius:var(--r-md);box-shadow:var(--sh-2)}
+.toast.error{background:var(--err-600)}
+
+/* --- Journey (home) ------------------------------------------------------- */
+.journey{margin-bottom:var(--s-5)}
+.journey-head{display:flex;justify-content:space-between;align-items:flex-start;gap:var(--s-4);margin-bottom:var(--s-4)}
+.journey-head h2{font-size:20px;margin:0 0 4px}
+.journey-steps{list-style:none;margin:0 0 var(--s-3);padding:0;display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:8px;counter-reset:step}
+.journey-step a{display:flex;flex-direction:column;gap:8px;height:100%;padding:12px;border:1px solid var(--line);border-radius:var(--r-md);text-decoration:none;color:var(--ink);background:var(--surface);transition:border-color .15s ease,background .15s ease}
+.journey-step a:hover{border-color:#bfc0ee;background:var(--brand-50)}
+.journey-dot{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:750;background:#eef0f7;color:var(--ink-2)}
+.journey-dot .icon{width:15px;height:15px}
+.journey-text{display:flex;flex-direction:column;gap:2px}
+.journey-text strong{font-size:12.5px;line-height:1.3}
+.journey-text small{font-size:11.5px;color:var(--muted);line-height:1.35}
+.journey-step.done .journey-dot{background:var(--ok-600);color:#fff}
+.journey-step.done small{color:var(--ok-600);font-weight:600}
+.journey-step.current a{border-color:var(--brand-500);box-shadow:0 0 0 3px var(--brand-100)}
+.journey-step.current .journey-dot{background:var(--brand-500);color:#fff}
+@media(max-width:1250px){.journey-steps{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(max-width:640px){.journey-steps{grid-template-columns:1fr 1fr}.journey-head{flex-direction:column}}
+
+/* --- CV Studio ------------------------------------------------------------ */
+.cv-layout{display:grid;grid-template-columns:minmax(0,1fr) minmax(320px,440px);gap:var(--s-5);align-items:start}
+.cv-preview{position:sticky;top:92px}
+.cv-live-preview{width:100%;height:min(78vh,820px);border:1px solid var(--line);border-radius:var(--r-md);background:#fff}
+.tailoring-results .badge{margin-right:6px}
+.tailoring-section-selection{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:4px 14px}
+.tailoring-section-selection .check{margin:4px 0}
+.offer-description p{max-height:260px;overflow:auto;font-size:13px;color:var(--ink-2)}
+.cv-diff{background:#f7f8fc;border:1px solid var(--line);border-radius:var(--r-sm);padding:10px;font-size:12px;max-height:220px;overflow:auto}
+@media(max-width:1100px){.cv-layout{grid-template-columns:1fr}.cv-preview{position:static}}
+
+/* --- Dark theme alignment ------------------------------------------------- */
+html.dark{--ink:#e8eaf6;--ink-2:#c3c7dc;--muted:#9aa0bb;--line:#2c3150;--line-strong:#3a4066;--surface:#191d33;--bg:#11142a;--brand-50:#222650;--brand-100:#2b2f63;--info-50:#1c2546;--warn-50:#2e2611;--ok-50:#0f2b23}
+html.dark .topbar{background:rgba(17,20,42,.86)}
+html.dark thead th{background:#1d2140}
+html.dark tbody tr:hover td{background:#1c2040}
+html.dark .journey-dot{background:#2a2f52;color:#d6d9ee}
+html.dark .notice{color:#cfd8f6;border-color:#2e3a66}
+html.dark .notice.warning{color:#f2d394;border-color:#5a4a1c}
+html.dark .badge.gray{background:#2a2e4c;color:#cdd1e6}
+
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{transition:none!important;animation:none!important}}
+
+.load-more{display:flex;justify-content:center;margin:20px 0}
+.load-more:not(:has(*)){display:none}
+@media(max-width:640px){.toolbar>*{flex:1 1 100%!important;max-width:none!important}}
+.empty .btn .icon{width:18px;height:18px;margin:0;color:inherit}
