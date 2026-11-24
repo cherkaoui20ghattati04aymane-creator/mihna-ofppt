@@ -4,10 +4,49 @@ import os
 import ipaddress
 import secrets
 from pathlib import Path
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 AUTH_ROOT = Path(__file__).resolve().parent
+
+
+def _hosted_sqlite(db_url: str, backend_url) -> bool:
+    """Validate the explicit, private persistent-state layout for hosted accounts."""
+    configured = os.environ.get('AUTH_PRODUCTION_SQLITE_ROOT', '').strip()
+    if not configured:
+        return False
+    root = Path(configured).expanduser()
+    if not root.is_absolute() or not root.is_dir():
+        raise RuntimeError('AUTH_PRODUCTION_SQLITE_ROOT doit désigner un dossier persistant absolu existant.')
+    root = root.resolve()
+    if root.is_relative_to(ROOT) or (os.name != 'nt' and root.stat().st_mode & 0o077):
+        raise RuntimeError('Le dossier de données doit être privé et séparé du code.')
+    if (backend_url.scheme != 'http' or backend_url.hostname != '127.0.0.1'
+            or backend_url.username or backend_url.password or backend_url.path
+            or backend_url.query or backend_url.fragment):
+        raise RuntimeError('Le profil SQLite hébergé exige un backend HTTP sur 127.0.0.1.')
+    if not db_url.startswith('sqlite:///'):
+        raise RuntimeError('Le profil SQLite hébergé exige une URL SQLite absolue.')
+    paths = {
+        'AUTH_DATABASE_URL': unquote(db_url[len('sqlite:///'):]),
+        **{key: os.environ.get(key, '') for key in
+           ('DATABASE', 'PRIVATE_DIR', 'BACKUP_DIR', 'AUTH_USER_DATA_ROOT')},
+    }
+    resolved = {}
+    for key, value in paths.items():
+        path = Path(value)
+        if not path.is_absolute() or path.resolve() == root or not path.resolve().is_relative_to(root):
+            raise RuntimeError(f'{key} doit rester dans le dossier persistant privé.')
+        resolved[key] = path.resolve()
+    if not resolved['DATABASE'].is_file() or not resolved['AUTH_DATABASE_URL'].is_file():
+        raise RuntimeError('Préparez et vérifiez les deux bases persistantes avant le démarrage.')
+    if len(set(resolved.values())) != len(resolved):
+        raise RuntimeError('Les chemins de catalogue, comptes et données privées doivent être distincts.')
+    if (os.environ.get('AUTH_MULTI_USER_MODE', '').lower() != 'true'
+            or os.environ.get('PUBLIC_DEMO_MODE', '').lower() != 'false'
+            or os.environ.get('DISABLE_BACKGROUND_SCHEDULER', '').lower() != 'true'):
+        raise RuntimeError('Le profil hébergé exige isolation par compte et planificateur désactivé.')
+    return True
 
 
 def _read_env_file(path: Path) -> None:
@@ -67,9 +106,11 @@ def load_config() -> dict:
         if not private_host:
             raise RuntimeError('Backend refusé : en production, utilisez une adresse privée/interne et une règle réseau qui interdit son accès Internet.')
     allow_registration = os.environ.get('AUTH_ALLOW_REGISTRATION', 'true' if profile == 'multi_user' else 'false').lower() == 'true'
+    production = os.environ.get('AUTH_ENV', 'local').lower() == 'production'
+    hosted_sqlite = production and profile == 'multi_user' and _hosted_sqlite(db_url, parsed)
     if profile != 'multi_user' and allow_registration:
         raise RuntimeError('L’inscription générale exige le profil multi_user et des bases isolées par compte.')
-    if profile == 'multi_user' and os.environ.get('AUTH_ENV', 'local').lower() != 'local':
+    if profile == 'multi_user' and os.environ.get('AUTH_ENV', 'local').lower() != 'local' and not hosted_sqlite:
         raise RuntimeError('Le profil multi_user est réservé au lancement local avec stockage durable isolé.')
     if profile == 'multi_user' and not allow_registration:
         raise RuntimeError('Le profil multi_user exige AUTH_ALLOW_REGISTRATION=true et des espaces SQLite isolés.')
@@ -89,7 +130,7 @@ def load_config() -> dict:
     if os.environ.get('AUTH_ENV', 'local').lower() == 'production':
         if not cookie_secure:
             raise RuntimeError('AUTH_COOKIE_SECURE=true est obligatoire en production sous HTTPS.')
-        if db_url.startswith('sqlite:'):
+        if db_url.startswith('sqlite:') and not hosted_sqlite:
             raise RuntimeError('SQLite locale/éphémère est refusée en production; configurez PostgreSQL persistant.')
         if db_url.startswith(('postgresql://', 'postgres://')):
             sslmode = parse_qs(urlparse(db_url).query).get('sslmode', [''])[0].lower()
@@ -110,6 +151,7 @@ def load_config() -> dict:
         'AUTH_GATEWAY_PORT': port,
         'AUTH_INTERNAL_SECRET': os.environ.get('AUTH_INTERNAL_SECRET', ''),
         'AUTH_ALLOW_REGISTRATION': allow_registration,
+        'AUTH_HOSTED_SQLITE': hosted_sqlite,
         'AUTH_ADMIN_EMAIL': os.environ.get('AUTH_ADMIN_EMAIL', '').strip().casefold(),
         'AUTH_BOOTSTRAP_ADMIN_PASSWORD': os.environ.get('AUTH_BOOTSTRAP_ADMIN_PASSWORD', ''),
         'AUTH_SESSION_SECRET': _session_secret(),

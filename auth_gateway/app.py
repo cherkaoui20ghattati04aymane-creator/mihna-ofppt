@@ -230,8 +230,9 @@ def create_app(overrides: dict | None = None) -> Flask:
         if not cfg['AUTH_ALLOW_REGISTRATION']:
             return auth_page('register', 'La création de compte est désactivée pour cette base privée.', csrf=current['csrf']), 403
         tunnel.initialize()
-        if cfg['AUTH_PROFILE'] == 'multi_user' and (cfg['AUTH_ENV'] != 'local' or tunnel.public_demo):
-            return auth_page('register', 'L’inscription est disponible uniquement en local avec le stockage isolé.', csrf=current['csrf']), 403
+        if cfg['AUTH_PROFILE'] == 'multi_user' and (
+                tunnel.public_demo or (cfg['AUTH_ENV'] != 'local' and not cfg['AUTH_HOSTED_SQLITE'])):
+            return auth_page('register', 'L’inscription exige un stockage isolé validé.', csrf=current['csrf']), 403
         if cfg['AUTH_PROFILE'] == 'demo' and not tunnel.public_demo:
             return auth_page('register', 'L’inscription du mode démo exige un jeu synthétique.', csrf=current['csrf']), 403
         if request.method == 'GET':
