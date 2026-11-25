@@ -10,6 +10,14 @@ La version locale de préparation ajoute `python -m auth_gateway.hosted`, avec l
 
 ## Variables à gérer dans le panneau privé
 
+### Essai PythonAnywhere Beginner
+
+PythonAnywhere fournit un seul worker WSGI dans le plan Beginner. Le point d’entrée de préparation `auth_gateway.single_wsgi.create_application()` expose uniquement la passerelle. Celle-ci appelle le backend en mémoire par WSGI. Elle conserve la validation de session interne, les contrôles CSRF et la sélection SQLite par compte. Aucun port privé ou processus persistant supplémentaire n’est nécessaire.
+
+Utiliser Python 3.12 si le compte le propose. Dans le fichier WSGI du panneau Web, ajouter le chemin du clonage audité à `sys.path`, définir `AUTH_CONFIG_FILE` vers le fichier d’environnement privé et affecter `application = create_application()` après import. Garder le fichier privé hors du dépôt et des chemins statiques. Les pages et les ressources Dash transitent par la passerelle. Pour le premier essai, n’exposer aucune base ou compte local. Vérifier le proxy réel, la redirection HTTPS, le redémarrage et la persistance sur une copie du catalogue public.
+
+La documentation de PythonAnywhere déconseille SQLite pour la production sur son système de fichiers réseau. Le profil Beginner suivant est donc une évaluation isolée. Il reste nécessaire de confirmer le verrouillage, le mode de journalisation, le quota et l’absence de perte après redémarrage. [Déploiement Flask](https://help.pythonanywhere.com/pages/Flask/) · [Bases disponibles](https://help.pythonanywhere.com/pages/KindsOfDatabases/) · [Limites Beginner](https://help.pythonanywhere.com/pages/FreeAccountsFeatures/).
+
 | Fonction | Noms |
 |---|---|
 | Passerelle | `AUTH_ENV`, `AUTH_PROFILE`, `AUTH_ALLOWED_HOSTS`, `AUTH_TRUSTED_PROXY_HOPS`, `AUTH_COOKIE_SECURE`, `AUTH_ALLOW_REGISTRATION` |

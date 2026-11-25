@@ -13,12 +13,13 @@ HOP_HEADERS = {'connection', 'keep-alive', 'proxy-authenticate', 'proxy-authoriz
 class BackendTunnel:
     """A loopback-only server-side session to the unchanged Flask application."""
 
-    def __init__(self, base_url: str, profile: str, internal_secret: str):
+    def __init__(self, base_url: str, profile: str, internal_secret: str, transport=None):
         self.base_url = base_url.rstrip('/')
         self.profile = profile
         self.internal_secret = internal_secret
-        self.http = requests.Session()
-        self.http.trust_env = False
+        self.http = transport if transport is not None else requests.Session()
+        if transport is None:
+            self.http.trust_env = False
         self.backend_csrf = ''
         self.public_demo = False
         self.ready = False

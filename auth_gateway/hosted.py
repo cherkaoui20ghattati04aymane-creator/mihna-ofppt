@@ -36,16 +36,9 @@ def stop(process):
         process.wait()
 
 
-def main():
-    parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('bind', help='Provider-assigned IP address and port for the gateway.')
-    options = parser.parse_args()
-    config = load_config()
+def preflight(config):
     if not config['AUTH_HOSTED_SQLITE'] or len(config['AUTH_INTERNAL_SECRET']) < 48:
-        parser.error('Le profil SQLite hébergé et le secret du canal privé sont requis.')
-    port = config['AUTH_BACKEND_PORT']
-    if config['AUTH_BACKEND_URL'] != f'http://127.0.0.1:{port}':
-        parser.error('Le port du backend doit correspondre à son URL de boucle locale.')
+        raise RuntimeError('Le profil SQLite hébergé et le secret du canal privé sont requis.')
     os.umask(0o077)
     os.environ['GEMINI_SEARCH_ENABLED'] = 'false'
     os.environ['SMTP_ENABLED'] = 'false'
@@ -57,9 +50,22 @@ def main():
                     or db.execute('PRAGMA foreign_key_check').fetchone()
                     or db.execute('SELECT 1 FROM sqlite_schema WHERE type=? AND name=?',
                                   ('table', expected)).fetchone() is None):
-                parser.error('Une base persistante échoue au contrôle de démarrage.')
+                raise RuntimeError('Une base persistante échoue au contrôle de démarrage.')
+            if db.execute('PRAGMA journal_mode').fetchone() != ('delete',):
+                raise RuntimeError('Le profil hébergé exige une base préparée en journalisation DELETE.')
             if expected == 'offres' and db.execute('PRAGMA user_version').fetchone() != (11,):
-                parser.error('Vérifiez la migration du catalogue avant son démarrage hébergé.')
+                raise RuntimeError('Vérifiez la migration du catalogue avant son démarrage hébergé.')
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('bind', help='Provider-assigned IP address and port for the gateway.')
+    options = parser.parse_args()
+    config = load_config()
+    port = config['AUTH_BACKEND_PORT']
+    if config['AUTH_BACKEND_URL'] != f'http://127.0.0.1:{port}':
+        parser.error('Le port du backend doit correspondre à son URL de boucle locale.')
+    preflight(config)
 
     def shutdown(*_):
         raise SystemExit(0)
